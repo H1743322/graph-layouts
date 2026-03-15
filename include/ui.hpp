@@ -33,6 +33,7 @@ class UIManager {
     int currentGraphSource = 1;
     std::string graphPathSrc = "graphs/fe_3elt.src";
     std::string graphPathMtx = "graphs/crack.mtx";
+    int defaultInputSize = 500;
     int gridWidth = 10, gridHeight = 10;
     int sierpinksiDepth = 2;
 
@@ -87,10 +88,10 @@ class UIManager {
         ImGui::Combo("Sources Name", &currentGraphSource, graphSources, IM_ARRAYSIZE(graphSources));
         switch (currentGraphSource) {
         case 0:
-            ImGui::InputText("File Path", &graphPathSrc[0], graphPathSrc.size() + 20);
+            ImGui::InputText("File Path", &graphPathSrc[0], defaultInputSize);
             break;
         case 1:
-            ImGui::InputText("File Path", &graphPathMtx[0], graphPathMtx.size() + 20);
+            ImGui::InputText("File Path", &graphPathMtx[0], defaultInputSize);
             break;
         case 2:
             ImGui::SliderInt("Width Nodes", &gridWidth, 1, 100);
