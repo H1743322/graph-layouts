@@ -88,8 +88,8 @@ void HarellKoren::localLayout(Graph& g, const std::vector<std::vector<float>>& d
         if (heap.empty())
             break;
 
-        auto top = heap.top();
-        int m = top.node;
+        const auto &top = heap.top();
+        const int m = top.node;
         float old_x = g.nodes[m].x;
         float old_y = g.nodes[m].y;
 

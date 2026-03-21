@@ -9,6 +9,8 @@ template <typename T, typename Compare = std::less<T>> class BinHeap {
     std::vector<T> heap_;
     std::vector<int> indices_;
     Compare cmp_;
+    // TODO: Decouple .node
+    // KeyFn key_;
 
     void swap(int i, int j) {
         std::swap(heap_[i], heap_[j]);
@@ -56,7 +58,7 @@ template <typename T, typename Compare = std::less<T>> class BinHeap {
     T pop() {
         if (heap_.empty())
             throw std::runtime_error("Heap is empty");
-        T top = heap_.front();
+        const T& top = heap_.front();
         indices_[top.node] = -1;
         if (heap_.size() > 1) {
             heap_[0] = heap_.back();
@@ -72,7 +74,7 @@ template <typename T, typename Compare = std::less<T>> class BinHeap {
         int idx = indices_[node];
         if (idx == -1)
             throw std::runtime_error("Invalid index for update");
-        T oldItem = heap_[idx];
+        const T& oldItem = heap_[idx];
         heap_[idx] = newItem;
         if (cmp_(oldItem, newItem))
             siftUp(idx);
