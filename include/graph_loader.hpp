@@ -1,10 +1,11 @@
 #include "graph.hpp"
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 inline void loadSotch(Graph& g, const std::string& path) {
-    std::clog << "Load SRC\n";
+    std::clog << "Load .src file: " << path << "\n";
     std::ifstream file(path);
     if (!file.is_open()) {
         throw std::runtime_error("failed to open file");
@@ -38,7 +39,7 @@ inline void loadSotch(Graph& g, const std::string& path) {
     file.close();
 }
 inline void loadMtx(Graph& g, const std::string& path) {
-    std::clog << "Load MTX\n";
+    std::clog << "Load .mtx file: " << path << "\n";
 
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -74,6 +75,16 @@ inline void loadMtx(Graph& g, const std::string& path) {
         g.addEdge(r - 1, c - 1, v);
     }
     file.close();
+}
+inline void loadGraphPath(Graph& g, const std::string& path) {
+    std::string ext = std::filesystem::path(path).extension().string();
+    if (ext == ".mtx") {
+        loadMtx(g, path);
+    } else if (ext == ".src") {
+        loadSotch(g, path);
+    } else {
+        std::clog << "invaid file type " << ext << "\n";
+    }
 }
 
 // Build a grid graph

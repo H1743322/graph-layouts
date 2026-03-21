@@ -7,6 +7,8 @@
 #include "imgui.h"
 #include "kamada_kawai.hpp"
 #include "walshaw.hpp"
+#include <filesystem>
+#include <imgui_stdlib.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -28,12 +30,18 @@ class UIManager {
 
     // Loader
     const char* graphSources[5] = {
-        "File .SRC", "File .MMX", "Grid", "Sierpinksi", "Torus",
+        "File Path",
+        "Grid",
+        "Sierpinksi",
+        "Torus",
     };
+
+    std::string graphPathFolder = "graphs/";
     int currentGraphSource = 1;
-    std::string graphPathSrc = "graphs/fe_3elt.src";
-    std::string graphPathMtx = "graphs/crack.mtx";
-    int defaultInputSize = 500;
+    std::vector<std::string> fileNames;
+    size_t selectedFileName = 0;
+    std::string selectedFilePath;
+
     int gridWidth = 10, gridHeight = 10;
     int sierpinksiDepth = 2;
 
@@ -80,48 +88,73 @@ class UIManager {
         ImGui::SliderFloat("Node Size", &nodeSize, 0.0f, 100.0f);
         ImGui::Separator();
     }
+    std::vector<std::string> LoadFilesNames(const std::string& path) {
+        fileNames.clear();
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+            return {};
+        }
+        std::vector<std::string> files;
+        for (const auto& file : std::filesystem::directory_iterator(path)) {
+            if (file.is_regular_file()) {
+                files.push_back(file.path().filename().string());
+            }
+        }
+        return files;
+    }
 
+    void renderFileNames() {
+        if (ImGui::BeginListBox("Files")) {
+            for (size_t i = 0; i < fileNames.size(); i++) {
+                bool isSelected = (selectedFileName == i);
+
+                if (ImGui::Selectable(fileNames[i].c_str(), isSelected)) {
+                    selectedFileName = i;
+                    selectedFilePath = std::string(graphPathFolder) + "/" + fileNames[i];
+                }
+
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndListBox();
+        }
+        if (ImGui::Button("Refresh")) {
+            fileNames = LoadFilesNames(graphPathFolder);
+        }
+    }
     void renderGraphLoader(Graph& graph, float W, float H) {
-        // if (!ImGui::CollapsingHeader("Graph Build", ImGuiTreeNodeFlags_DefaultOpen))
-        //     return;
 
         ImGui::Combo("Sources Name", &currentGraphSource, graphSources, IM_ARRAYSIZE(graphSources));
         switch (currentGraphSource) {
-        case 0:
-            ImGui::InputText("File Path", &graphPathSrc[0], defaultInputSize);
+        case 0: {
+            ImGui::InputText("File Path", &graphPathFolder);
+            renderFileNames();
             break;
+        }
         case 1:
-            ImGui::InputText("File Path", &graphPathMtx[0], defaultInputSize);
-            break;
-        case 2:
             ImGui::SliderInt("Width Nodes", &gridWidth, 1, 100);
             ImGui::SliderInt("Height Nodes", &gridHeight, 1, 100);
             break;
-        case 3:
+        case 2:
             ImGui::SliderInt("Depth", &sierpinksiDepth, 1, 20);
             break;
-        case 4:
+        case 3:
             ImGui::SliderInt("Width Nodes", &gridWidth, 1, 200);
             ImGui::SliderInt("Height Nodes", &gridHeight, 1, 200);
             break;
         }
-
         if (ImGui::Button("Load Graph")) {
             graph.clear();
             switch (currentGraphSource) {
             case 0:
-                loadSotch(graph, graphPathSrc);
+                loadGraphPath(graph, selectedFilePath);
                 break;
             case 1:
-                loadMtx(graph, graphPathMtx);
-                break;
-            case 2:
                 buildGrid(graph, gridWidth, gridHeight);
                 break;
-            case 3:
+            case 2:
                 buildSierpinski(graph, sierpinksiDepth);
                 break;
-            case 4:
+            case 3:
                 buildTorus(graph, gridWidth, gridHeight);
                 break;
             }
@@ -130,8 +163,6 @@ class UIManager {
     }
 
     void renderLayout(Graph& graph, float W, float H) {
-        // if (!ImGui::CollapsingHeader("Layout", ImGuiTreeNodeFlags_DefaultOpen))
-        //     return;
 
         ImGui::Combo("Layout Name", &currentLayout, layoutItems, IM_ARRAYSIZE(layoutItems));
 

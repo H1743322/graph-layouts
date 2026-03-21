@@ -25,11 +25,13 @@ file(GLOB IMGUI_SOURCES
     external/imgui/*.cpp
     external/imgui/backends/imgui_impl_glfw.cpp
     external/imgui/backends/imgui_impl_opengl3.cpp
+    external/imgui/misc/cpp/imgui_stdlib.cpp
 )
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC
     external/imgui
     external/imgui/backends
+    external/imgui/misc/cpp
 )
 
 file(GLOB_RECURSE CORE_SOURCES "src/*.cpp")
