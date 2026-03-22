@@ -29,7 +29,7 @@ class UIManager {
     bool initialized = false;
 
     // Loader
-    const char* graphSources[5] = {
+    const char* graphSources[4] = {
         "File Path",
         "Grid",
         "Sierpinksi",

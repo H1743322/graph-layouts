@@ -18,7 +18,7 @@ constexpr float HEIGHT = 900;
 // height); }
 
 int main() {
-    // Initialize GLFW
+
     if (!glfwInit()) {
         std::cerr << "Failed to init GLFW\n";
         return -1;
@@ -50,7 +50,6 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
     ImGui::StyleColorsDark();
 
-    // Build graph and layout
     Graph graph;
     Camera2D camera;
     Render render(&graph);
@@ -62,17 +61,19 @@ int main() {
     glfwSetScrollCallback(window, scrollCallback);
 
     float lastTime = glfwGetTime();
-    // Main loop
+
     while (!glfwWindowShouldClose(window)) {
         float currentTime = glfwGetTime();
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
         glfwPollEvents();
+
+        // Input
         handleCameraInput(camera, window, deltaTime);
         handleMouseCamera(camera, window);
 
-        // Start ImGui frame
+        // ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
